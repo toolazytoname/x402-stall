@@ -14,12 +14,13 @@ This repo is the **cash register**, not the store. Unique data should come from 
 cd x402-stall
 npm install
 npm test
-npx tsx src/cli.ts doctor
+# 模拟 facilitator（测试 / 本地）
 npx tsx src/cli.ts serve --port 8420
-# other terminal:
-curl -sS http://127.0.0.1:8420/health
-curl -sS -D- http://127.0.0.1:8420/demo/ping
+# 真 facilitator（Base Sepolia 公开 facilitator，收款地址用环境变量）
+PAY_TO=0xYourAddress X402_MODE=facilitator npx tsx src/cli.ts serve --port 8420
 ```
+
+公开 `https://x402.org/facilitator` 是测试网。主网要 CDP key，本进程仍然不托管买方私钥。
 
 ## What we will not do
 

@@ -8,6 +8,13 @@ import {
   simSecret,
   verifyPayment,
 } from "./pay.js";
+import {
+  challenge402,
+  configFromEnv,
+  settle,
+  verify,
+  type StallConfig,
+} from "./facilitator.js";
 
 const open = new Map<string, number>();
 
@@ -36,13 +43,13 @@ function pathOf(req: IncomingMessage): string {
   return (req.url ?? "/").split("?")[0] ?? "/";
 }
 
-export function createStallServer(): Server {
+export function createStallServer(cfg: StallConfig = configFromEnv()): Server {
   return createServer((req, res) => {
-    void handle(req, res);
+    void handle(req, res, cfg);
   });
 }
 
-async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function handle(req: IncomingMessage, res: ServerResponse, cfg: StallConfig): Promise<void> {
   const path = pathOf(req);
   if (req.method === "GET" && path === "/health") {
     send(res, 200, { ok: true });
@@ -51,9 +58,35 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
   if (req.method === "GET" && path === "/demo/ping") {
     const header = req.headers["x-payment"];
     if (!header || Array.isArray(header)) {
+      if (cfg.mode === "facilitator") {
+        send(res, 402, challenge402(cfg), { "X-Payment-Required": "x402" });
+        return;
+      }
       const ch = makeChallenge(DEFAULT_AMOUNT);
       open.set(ch.nonce, ch.amount);
       send(res, 402, challengeBody(ch), { "X-Payment-Required": "sim" });
+      return;
+    }
+    if (cfg.mode === "facilitator") {
+      try {
+        const payload = JSON.parse(header);
+        const reqs = {
+          scheme: "exact",
+          network: cfg.network,
+          maxAmountRequired: cfg.amount,
+          payTo: cfg.payTo,
+          asset: cfg.asset,
+        };
+        const checked = await verify(cfg.facilitatorUrl, payload, reqs);
+        if (!checked.isValid) {
+          send(res, 402, { ok: false, error: checked.invalidReason ?? "invalid payment" });
+          return;
+        }
+        const settled = await settle(cfg.facilitatorUrl, payload, reqs);
+        send(res, 200, { ok: true, path: "/demo/ping", settled, paid_amount: cfg.amount });
+      } catch (e) {
+        send(res, 400, { ok: false, error: e instanceof Error ? e.message : "bad payment" });
+      }
       return;
     }
     try {
@@ -94,8 +127,12 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
   send(res, 404, { ok: false, error: "not found" });
 }
 
-export function listen(host: string, port: number): Promise<{ server: Server; port: number }> {
-  const server = createStallServer();
+export function listen(
+  host: string,
+  port: number,
+  cfg: StallConfig = configFromEnv(),
+): Promise<{ server: Server; port: number }> {
+  const server = createStallServer(cfg);
   return new Promise((resolve, reject) => {
     server.listen(port, host, () => {
       const addr = server.address();
