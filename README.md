@@ -8,20 +8,18 @@ This repo is the **cash register**, not the store. Unique data should come from 
 
 ## Status
 
-**v0.1 runtime.** Local simulated facilitator (HMAC proof). No user custody, no real USDC required.
+**v0.1 runtime (TypeScript, Node ≥20).** Local simulated facilitator (HMAC-SHA256, timing-safe verify). No user custody, no real USDC required. This is the protocol-native stack (HTTP 402 / agent payments).
 
 ```bash
 cd x402-stall
-PYTHONPATH=. python3 -m x402stall doctor
-PYTHONPATH=. python3 -m x402stall serve --port 8420
+npm install
+npm test
+npx tsx src/cli.ts doctor
+npx tsx src/cli.ts serve --port 8420
 # other terminal:
 curl -sS http://127.0.0.1:8420/health
-curl -sS -D- http://127.0.0.1:8420/demo/ping   # 402 + nonce
-# POST /sim/pay {"nonce": "..."} then GET /demo/ping with header X-PAYMENT
-PYTHONPATH=. python3 -m unittest discover -s tests -v
+curl -sS -D- http://127.0.0.1:8420/demo/ping
 ```
-
-`GET /health` is free. `GET /demo/ping` returns **402** until a valid simulated payment, then JSON.
 
 ## What we will not do
 

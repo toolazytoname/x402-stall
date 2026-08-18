@@ -1,0 +1,22 @@
+{
+  "name": "x402-stall",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "HTTP 402 stall with a local simulated facilitator",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.json --noEmit && node --import tsx --test test/*.test.ts",
+    "start": "tsx src/cli.ts serve --port 8420",
+    "doctor": "tsx src/cli.ts doctor"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}
