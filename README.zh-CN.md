@@ -8,7 +8,7 @@ HTTP **402 Payment Required** 摊位：脚本或 AI agent 付一笔小额 USDC�
 
 ## 状态
 
-空仓库 + 规格。第一目标：跑通 请求 → 402 → 付款 → 返回 JSON。
+**v0.1 可运行。** 本地模拟 facilitator。`GET /health` 免费，`GET /demo/ping` 先 402 再付钱后返回 JSON。
 
 ## 明确不做
 

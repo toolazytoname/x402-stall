@@ -8,7 +8,20 @@ This repo is the **cash register**, not the store. Unique data should come from 
 
 ## Status
 
-Scaffold. Spec is in `docs/`. First goal is one working loop: request → 402 → pay → JSON.
+**v0.1 runtime.** Local simulated facilitator (HMAC proof). No user custody, no real USDC required.
+
+```bash
+cd x402-stall
+PYTHONPATH=. python3 -m x402stall doctor
+PYTHONPATH=. python3 -m x402stall serve --port 8420
+# other terminal:
+curl -sS http://127.0.0.1:8420/health
+curl -sS -D- http://127.0.0.1:8420/demo/ping   # 402 + nonce
+# POST /sim/pay {"nonce": "..."} then GET /demo/ping with header X-PAYMENT
+PYTHONPATH=. python3 -m unittest discover -s tests -v
+```
+
+`GET /health` is free. `GET /demo/ping` returns **402** until a valid simulated payment, then JSON.
 
 ## What we will not do
 
