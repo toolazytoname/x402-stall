@@ -1,6 +1,6 @@
 # x402-stall
 
-**English** · [中文](README.zh-CN.md) — plan: [docs/PROJECT-PLAN.md](docs/PROJECT-PLAN.md)
+**English** · [中文](README.zh-CN.md) — plan: [docs/PROJECT-PLAN.md](docs/PROJECT-PLAN.md) · 学习: [learn/](learn/)
 
 An HTTP **402 Payment Required** stall: agents or scripts pay a small USDC amount, then get JSON.
 

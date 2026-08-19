@@ -37,6 +37,7 @@ export function verifyPayment(secret: string, nonce: string, amount: number, pro
   if (a.length !== b.length) {
     return false;
   }
+  // Constant-time compare: a naive `===` leaks via timing if an attacker forges proofs.
   return timingSafeEqual(a, b);
 }
 
