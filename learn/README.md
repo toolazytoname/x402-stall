@@ -1,5 +1,23 @@
 # 学习模块 · x402-stall
 
+![封面](assets/cover.jpg)
+
+[封面动画 6s](assets/cover.mp4)
+
+## 架构
+
+![架构](assets/architecture.svg)
+
+```mermaid
+flowchart TD
+  C[client] -->|GET /health| H[200 免费]
+  C -->|GET /demo/ping 无支付| B[402 accepts]
+  B -->|sim HMAC| S[timingSafeEqual]
+  B -->|facilitator| V[verify + settle]
+  S --> J[200 JSON]
+  V --> J
+```
+
 ```bash
 cd x402-stall
 npm test
